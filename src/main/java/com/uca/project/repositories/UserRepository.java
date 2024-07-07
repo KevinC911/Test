@@ -1,5 +1,6 @@
 package com.uca.project.repositories;
 
+import com.uca.project.domain.entities.Home;
 import com.uca.project.domain.entities.Role;
 import com.uca.project.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

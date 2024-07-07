@@ -1,12 +1,10 @@
 package com.uca.project.services.servicesImpl;
 
+import com.uca.project.domain.DTOs.ArrivalInvitationDTO;
 import com.uca.project.domain.DTOs.InvitationParsedDTO;
 import com.uca.project.domain.DTOs.InvitationGuestsParsedDTO;
-import com.uca.project.domain.entities.Home;
-import com.uca.project.domain.entities.Invitation;
-import com.uca.project.domain.entities.User;
-import com.uca.project.repositories.DateRepository;
-import com.uca.project.repositories.InvitationRepository;
+import com.uca.project.domain.entities.*;
+import com.uca.project.repositories.*;
 import com.uca.project.services.InvitationService;
 import com.uca.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +17,16 @@ import java.util.UUID;
 @Service
 public class InvitationServiceImpl implements InvitationService {
 
+    private final EntryRepository entryRepository;
+
+    private final RoleRepository roleRepository;
+
     private final InvitationRepository invitationRepository;
 
-    public InvitationServiceImpl(InvitationRepository invitationRepository) {
+    public InvitationServiceImpl(InvitationRepository invitationRepository, RoleRepository roleRepository, EntryRepository entryRepository) {
         this.invitationRepository = invitationRepository;
+        this.roleRepository = roleRepository;
+        this.entryRepository = entryRepository;
     }
 
     @Override
@@ -134,12 +138,18 @@ public class InvitationServiceImpl implements InvitationService {
     public List<InvitationGuestsParsedDTO> findAllInvitationsByUser(User user) {
         List<Invitation> invitations = invitationRepository.findAllByUserAndInvitationStateTrue(user);
         List<InvitationGuestsParsedDTO> invitationsDTO = new ArrayList<>();
+        Role role = roleRepository.findByRoleOrName("RSDT", "RSDT");
+
         if(invitations != null){
             for (Invitation invitation : invitations) {
                 if(!invitation.isRequest()){
                     InvitationGuestsParsedDTO parsedDTO = new InvitationGuestsParsedDTO();
+                    for(User resident: invitation.getHome().getUsers()){
+                        if(resident.getRoles().contains(role)){
+                            parsedDTO.setName(user.getUsername());
+                        }
+                    }
                     parsedDTO.setId(invitation.getCode());
-                    parsedDTO.setName(invitation.getUser().getUsername());
                     parsedDTO.setHome(invitation.getHome().getNumHome());
                     parsedDTO.setDates(invitation.getDates());
                     invitationsDTO.add(parsedDTO);
@@ -147,5 +157,19 @@ public class InvitationServiceImpl implements InvitationService {
             }
         }
         return invitationsDTO;
+    }
+
+    @Override
+    public List<ArrivalInvitationDTO> findAllInvitationInfoByUser(User user) {
+        List<Entry> entries = entryRepository.findEntriesByUser(user);
+        List<ArrivalInvitationDTO> data = new ArrayList<>();
+        for(Entry entry: entries){
+            ArrivalInvitationDTO invitationDTO = new ArrivalInvitationDTO();
+            invitationDTO.setHome(entry.getHome().getNumHome());
+            invitationDTO.setArrivalTime(entry.getArrivalDateTime());
+            data.add(invitationDTO);
+        }
+
+        return data;
     }
 }

@@ -63,7 +63,7 @@ public class QRController {
 
         if(invi.getQr() != null ){
             if(invi.getQr().isActive() && now.isBefore(invi.getQr().getFinal_datetime())){
-                return new ResponseEntity<>("Codigo QR ya existe, y es valido", HttpStatus.NOT_MODIFIED);
+                return new ResponseEntity<>(invi.getQr().getHash(), HttpStatus.OK);
             }
             hash = qrService.reGenerateQR(invi.getQr());
             return new ResponseEntity<>(hash, HttpStatus.CREATED);
@@ -84,7 +84,7 @@ public class QRController {
 
         if(user.getQr() != null){
             if(user.getQr().isActive() && now.isBefore(user.getQr().getFinal_datetime())){
-                return new ResponseEntity<>("Codigo QR ya existe, y es valido", HttpStatus.OK);
+                return new ResponseEntity<>(user.getQr().getHash(), HttpStatus.OK);
             }
             hash = qrService.reGenerateQR(user.getQr());
             return new ResponseEntity<>(hash, HttpStatus.CREATED);

@@ -14,6 +14,7 @@ import com.uca.project.services.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -78,22 +79,31 @@ public class HomeServiceImpl implements HomeService {
     @Override   //necesito en la vista del admin
     public List<HomeResponseDTO> findAllHomes() {
         List<Home> homes = homeRepository.findAll();
+        List<HomeResponseDTO> response = new ArrayList<>();
 
-        return homes.stream().map(home -> {
-            List<String> representatives = home.getUsers().stream()
-                    .filter(user -> {
-                        boolean isRepresentative = user.getRoles().stream().anyMatch(role -> role.getRole().equals("RSDT"));
-                        return isRepresentative;
-                    })
-                    .map(user -> {
-                        String username = user.getUsername() != null ? user.getUsername() : "N/A";
-                        return username;
-                    })
-                    .collect(Collectors.toList());
+        for(Home home: homes){
+            HomeResponseDTO homeDTO = new HomeResponseDTO();
+            homeDTO.setCode(home.getCode());
+            homeDTO.setNumHome(home.getNumHome());
+
+            if(home.getUsers() != null){
+                for(User user: home.getUsers()){
+                    if(user.getRoles().get(0).getRole().equals("RSDT")){
+                        homeDTO.AddToRepresentatives(user.getEmail());
+                        break;
+                    }
+                }
+            }
 
 
-            return new HomeResponseDTO(home.getCode(), home.getNumHome(), representatives.isEmpty() ? List.of("N/A") : representatives);
-        }).collect(Collectors.toList());
+            if(homeDTO.getRepresentatives().isEmpty()){
+                homeDTO.AddToRepresentatives("N/A");
+            }
+            response.add(homeDTO);
+        }
+
+        return response;
+
     }
 
     @Override   //necesito en la vista deladmin

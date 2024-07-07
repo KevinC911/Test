@@ -26,6 +26,10 @@ public class RoleController {
 
     @PostMapping("/role")
     public ResponseEntity<?> createRole(@RequestBody AddRoleDTO info){
+        if(roleService.getRole(info.getCode()) != null
+        || roleService.getRole(info.getName()) != null) {
+            return new ResponseEntity<>("El rol ya existe", HttpStatus.CONFLICT);
+        }
         roleService.addRole(info.getCode(), info.getName());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -34,6 +38,13 @@ public class RoleController {
     public ResponseEntity<?> createUserRole(@RequestBody AddRoleToUserDTO info){
         User user = userService.findByIdentifier(info.getIdentifier());
         Role role = roleService.getRole(info.getRole_name());
+
+        if(user == null){
+            return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+        } else if (role == null){
+            return new ResponseEntity<>("Rol no encontrado", HttpStatus.NOT_FOUND);
+        }
+
         roleService.addRoleToUser(role, user);
 
         return new ResponseEntity<>(HttpStatus.CREATED);

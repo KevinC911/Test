@@ -1,5 +1,6 @@
 package com.uca.project.services;
 
+import com.uca.project.domain.DTOs.ArrivalInvitationDTO;
 import com.uca.project.domain.DTOs.InvitationParsedDTO;
 import com.uca.project.domain.DTOs.InvitationGuestsParsedDTO;
 import com.uca.project.domain.entities.Home;
@@ -21,6 +22,7 @@ public interface InvitationService {
     List<InvitationParsedDTO> findAllRequestedInvitationsByHome(Home home);
     void deactivateInvitation(Invitation invitation);
     List<InvitationGuestsParsedDTO> findAllInvitationsByUser(User user);
+    List<ArrivalInvitationDTO> findAllInvitationInfoByUser(User user);
 }
 
 

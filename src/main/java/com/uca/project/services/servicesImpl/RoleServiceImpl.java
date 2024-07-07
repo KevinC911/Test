@@ -34,6 +34,12 @@ public class RoleServiceImpl implements RoleService {
     public void addRoleToUser(Role role, User user) {
         List<Role> roles = new ArrayList<>();
         roles.add(role);
+        if(role.getRole().contains("VSTT") || role.getRole().contains("ADMN") || role.getRole().contains("GRDA")){
+            if(user.getRoles().get(0).getRole().contains("RSDT")
+                    || user.getRoles().get(0).getRole().contains("RSNR")){
+                user.setHomes(null);
+            }
+        }
         user.setRoles(roles);
         userRepository.save(user);
     }

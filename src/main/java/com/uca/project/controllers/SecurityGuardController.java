@@ -5,6 +5,7 @@ import com.uca.project.domain.entities.User;
 import com.uca.project.services.RoleService;
 import com.uca.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,10 +32,13 @@ public class SecurityGuardController {
             User user = userService.findByIdentifier(email);
             if (user != null) {
                 Role role = roleService.getRole("GRDA");
+                if(user.getRoles().contains(role)){
+                    return new ResponseEntity<>("Guardia ya asignado", HttpStatus.NOT_MODIFIED);
+                }
                 roleService.addRoleToUser(role, user);
-                return ResponseEntity.ok("Role assigned successfully");
+                return ResponseEntity.ok("Guardia asignado correctamente");
             } else {
-                return ResponseEntity.status(404).body("User not found");
+                return ResponseEntity.status(404).body("Usuario no encontrado");
             }
         } catch (Exception e) {
             e.printStackTrace(); // Log de error
@@ -59,7 +63,7 @@ public class SecurityGuardController {
                 User user = userService.findById(userId);
                 Role role = roleService.getRole("VSTT");
                 roleService.addRoleToUser(role, user);
-                return ResponseEntity.ok("Role removed successfully");
+                return ResponseEntity.ok("Guardia removido");
             } catch (Exception e) {
                 return ResponseEntity.status(500).body("An error occurred");
             }

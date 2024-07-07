@@ -41,8 +41,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByIdentifier(String identifier) {
-        UUID id = UUID.fromString(identifier);
-        return userRepository.findOneUserByUsernameOrEmailOrCode(identifier, identifier, id);
+        try{
+            UUID id = UUID.fromString(identifier);
+            return userRepository.findById(id).orElse(null);
+        }catch (IllegalArgumentException e){
+        }
+        return userRepository.findOneUserByUsernameOrEmail(identifier, identifier);
     }
 
     @Override

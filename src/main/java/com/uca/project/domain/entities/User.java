@@ -1,5 +1,6 @@
 package com.uca.project.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -51,7 +52,7 @@ public class User implements UserDetails {
     private Entry entry;
 
     @OneToOne(mappedBy = "user")
-    @JsonIgnore
+    @JsonBackReference
     private QR qr;
 
     @Override

@@ -121,6 +121,12 @@ public class InvitationController {
         return new ResponseEntity<>(invitationServiceImpl.findAllInvitationsByUser(user), HttpStatus.OK);
     }
 
+    @GetMapping("get/invitations-info")
+    public ResponseEntity<?> getInvitationInfo() {
+        User user = userService.findUserAuthenticated();
+        return new ResponseEntity<>(invitationServiceImpl.findAllInvitationInfoByUser(user), HttpStatus.OK);
+    }
+
 
     @PostMapping("/deactivate/{invitationID}")
     public ResponseEntity<?> deActivateInvitation(@PathVariable String invitationID){

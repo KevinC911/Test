@@ -60,16 +60,38 @@ public class HomeController {
             homeService.addUserToHome(user, home);
         }
 
+        return new ResponseEntity<>("Residente encargado añadido", HttpStatus.CREATED);
+    }
 
+    @PostMapping("/assign/normal")
+    public ResponseEntity<?> assignNormalResidentToHome(@RequestBody AddHomeToUserDTO info) {
+        User user = userService.findByIdentifier(info.getIdentifier());
+        Home home = homeService.getHome(info.getNum_home());
 
-        return new ResponseEntity<>("Usuario añadido", HttpStatus.CREATED);
+        if(user == null || home == null){
+            return new ResponseEntity<>("User or home not found", HttpStatus.NOT_FOUND);
+        }
+
+        Role role = roleService.getRole("RSNR");
+
+        if(user.getRoles().contains(role) && user.getHomes().contains(home)){
+            return new ResponseEntity<>("El usuario ya esta asignado a una casa", HttpStatus.NOT_MODIFIED);
+        } else if(user.getRoles().contains(role)){
+            homeService.addUserToHome(user,home);
+        } else if(user.getHomes().contains(home)){
+            roleService.addRoleToUser(role, user);
+        } else{
+            roleService.addRoleToUser(role, user);
+            homeService.addUserToHome(user, home);
+        }
+
+        return new ResponseEntity<>("Residente añadido", HttpStatus.CREATED);
     }
 
     //vista en el admin, lista las casas
     @GetMapping("/list")
-    public ResponseEntity<List<HomeResponseDTO>> listAllHomes() {
-        List<HomeResponseDTO> homes = homeService.findAllHomes();
-        return ResponseEntity.ok(homes);
+    public ResponseEntity<?> listAllHomes() {
+        return new ResponseEntity<>(homeService.findAllHomes(), HttpStatus.OK);
     }
     //vista en el admin, obtine residente de numero de cas
     @GetMapping("/residents")
