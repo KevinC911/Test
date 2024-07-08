@@ -11,6 +11,8 @@ import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 public class QRServiceImpl implements QRService {
@@ -33,9 +35,10 @@ public class QRServiceImpl implements QRService {
         qr.setUser(user);
         qr.setActive(true);
 
-        LocalDateTime now = LocalDateTime.now().plusMinutes(10);
+        ZonedDateTime zonedtime = ZonedDateTime.now(ZoneId.of("America/Chicago"));
 
-        qr.setFinal_datetime(now);
+
+        qr.setFinal_datetime(zonedtime.toLocalDateTime().plusMinutes(10));
         qrRepository.save(qr);
         return hash;
 
@@ -50,7 +53,9 @@ public class QRServiceImpl implements QRService {
     public String reGenerateQR(QR qr) {
         String hash = hashGenerator.genHash();
         qr.setHash(hash);
-        qr.setFinal_datetime(LocalDateTime.now().plusMinutes(10));
+        ZonedDateTime zonedtime = ZonedDateTime.now(ZoneId.of("America/Chicago"));
+
+        qr.setFinal_datetime(zonedtime.toLocalDateTime().plusMinutes(10));
         qr.setActive(true);
         qrRepository.save(qr);
         return hash;

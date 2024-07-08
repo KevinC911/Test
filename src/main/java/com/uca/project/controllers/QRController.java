@@ -112,7 +112,7 @@ public class QRController {
     @PostMapping("/validate/{hash}")
     public ResponseEntity<?> validateQR(@PathVariable String hash) {
         QR qr = qrService.findByHash(hash);
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
 
         if(qr == null){
             return new ResponseEntity<>("QR no encontrado", HttpStatus.NOT_FOUND);
@@ -120,7 +120,10 @@ public class QRController {
             return new ResponseEntity<>("QR invalido", HttpStatus.FORBIDDEN);
         }
 
-        if(now.isAfter(qr.getFinal_datetime())){
+        ZonedDateTime FinalDate = qr.getFinal_datetime().atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
+
+        if(now.isAfter(FinalDate)){
             return new ResponseEntity<>("El tiempo valido ha pasado", HttpStatus.FORBIDDEN);
         }
 
@@ -134,13 +137,13 @@ public class QRController {
             }
 
             qrService.deActivateQR(qr);
-            entryService.createEntry(qr.getInvitation().getUser(), qr.getInvitation().getHome(), now);
+            entryService.createEntry(qr.getInvitation().getUser(), qr.getInvitation().getHome(), now.toLocalDateTime());
             return new ResponseEntity<>("Entrada validada", HttpStatus.OK);
 
         }
 
         qrService.deActivateQR(qr);
-        entryService.createEntry(qr.getUser(), qr.getUser().getHomes().get(0), now);
+        entryService.createEntry(qr.getUser(), qr.getUser().getHomes().get(0), now.toLocalDateTime());
         return new ResponseEntity<>("Entrada validada", HttpStatus.OK);
     }
 }
