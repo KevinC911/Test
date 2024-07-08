@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @RestController
@@ -40,9 +42,8 @@ public class QRController {
 
         String hash;
         boolean checkValidDate = false;
-        LocalDateTime now = LocalDateTime.now();
         User user = null;
-
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
 
         Invitation invi = invitationService.findById(UUID.fromString(id));
 
@@ -51,7 +52,15 @@ public class QRController {
         }
 
         for(Date date: invi.getDates()){
-            if (now.isAfter(date.getStart_datetime()) && now.isBefore(date.getEnd_datetime())) {
+            LocalDateTime StartDate = date.getStart_datetime();
+            LocalDateTime EndDate = date.getEnd_datetime();
+            ZonedDateTime StartZonedDate = StartDate.atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+
+            ZonedDateTime EndZonedDate = EndDate.atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+
+            if (now.isAfter(StartZonedDate) && now.isBefore(EndZonedDate)) {
                 checkValidDate = true;
                 break;
             }
@@ -63,7 +72,9 @@ public class QRController {
 
 
         if(invi.getQr() != null ){
-            if(invi.getQr().isActive() && now.isBefore(invi.getQr().getFinal_datetime())){
+            ZonedDateTime FinalDate = invi.getQr().getFinal_datetime().atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+            if(invi.getQr().isActive() && now.isBefore(FinalDate)){
                 return new ResponseEntity<>(invi.getQr().getHash(), HttpStatus.OK);
             }
             hash = qrService.reGenerateQR(invi.getQr());
@@ -81,10 +92,13 @@ public class QRController {
         User user = userService.findUserAuthenticated();
         Invitation invi = null;
         String hash;
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
 
         if(user.getQr() != null){
-            if(user.getQr().isActive() && now.isBefore(user.getQr().getFinal_datetime())){
+            ZonedDateTime FinalDate = user.getQr().getFinal_datetime().atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+
+            if(user.getQr().isActive() && now.isBefore(FinalDate)){
                 return new ResponseEntity<>(user.getQr().getHash(), HttpStatus.OK);
             }
             hash = qrService.reGenerateQR(user.getQr());
