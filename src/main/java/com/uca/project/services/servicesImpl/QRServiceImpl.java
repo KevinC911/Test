@@ -54,7 +54,7 @@ public class QRServiceImpl implements QRService {
         String hash = hashGenerator.genHash();
         qr.setHash(hash);
         ZonedDateTime zonedtime = ZonedDateTime.now(ZoneId.of("America/Chicago"));
-
+git
         qr.setFinal_datetime(zonedtime.toLocalDateTime().plusMinutes(10));
         qr.setActive(true);
         qrRepository.save(qr);
