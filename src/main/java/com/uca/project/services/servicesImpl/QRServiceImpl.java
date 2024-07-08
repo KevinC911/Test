@@ -35,10 +35,13 @@ public class QRServiceImpl implements QRService {
         qr.setUser(user);
         qr.setActive(true);
 
-        ZonedDateTime zonedtime = ZonedDateTime.now(ZoneId.of("America/Chicago"));
+        LocalDateTime serverLocalDateTime = LocalDateTime.now();
+
+        ZonedDateTime now = serverLocalDateTime.atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
 
 
-        qr.setFinal_datetime(zonedtime.toLocalDateTime().plusMinutes(10));
+        qr.setFinal_datetime(now.toLocalDateTime().plusMinutes(10));
         qrRepository.save(qr);
         return hash;
 
@@ -53,9 +56,12 @@ public class QRServiceImpl implements QRService {
     public String reGenerateQR(QR qr) {
         String hash = hashGenerator.genHash();
         qr.setHash(hash);
-        ZonedDateTime zonedtime = ZonedDateTime.now(ZoneId.of("America/Chicago"));
-git
-        qr.setFinal_datetime(zonedtime.toLocalDateTime().plusMinutes(10));
+        LocalDateTime serverLocalDateTime = LocalDateTime.now();
+
+        ZonedDateTime now = serverLocalDateTime.atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
+
+        qr.setFinal_datetime(now.toLocalDateTime().plusMinutes(10));
         qr.setActive(true);
         qrRepository.save(qr);
         return hash;

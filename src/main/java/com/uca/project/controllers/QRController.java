@@ -43,7 +43,10 @@ public class QRController {
         String hash;
         boolean checkValidDate = false;
         User user = null;
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
+        LocalDateTime serverLocalDateTime = LocalDateTime.now();
+
+        ZonedDateTime now = serverLocalDateTime.atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
 
         Invitation invi = invitationService.findById(UUID.fromString(id));
 
@@ -52,13 +55,8 @@ public class QRController {
         }
 
         for(Date date: invi.getDates()){
-            LocalDateTime StartDate = date.getStart_datetime();
-            LocalDateTime EndDate = date.getEnd_datetime();
-            ZonedDateTime StartZonedDate = StartDate.atZone(ZoneId.systemDefault())
-                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
-
-            ZonedDateTime EndZonedDate = EndDate.atZone(ZoneId.systemDefault())
-                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+            ZonedDateTime StartZonedDate = date.getStart_datetime().atZone(ZoneId.of("America/Chicago"));
+            ZonedDateTime EndZonedDate = date.getEnd_datetime().atZone(ZoneId.of("America/Chicago"));
 
             if (now.isAfter(StartZonedDate) && now.isBefore(EndZonedDate)) {
                 checkValidDate = true;
@@ -72,8 +70,7 @@ public class QRController {
 
 
         if(invi.getQr() != null ){
-            ZonedDateTime FinalDate = invi.getQr().getFinal_datetime().atZone(ZoneId.systemDefault())
-                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+            ZonedDateTime FinalDate = invi.getQr().getFinal_datetime().atZone(ZoneId.of("America/Chicago"));
             if(invi.getQr().isActive() && now.isBefore(FinalDate)){
                 return new ResponseEntity<>(invi.getQr().getHash(), HttpStatus.OK);
             }
@@ -92,11 +89,14 @@ public class QRController {
         User user = userService.findUserAuthenticated();
         Invitation invi = null;
         String hash;
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
+
+        LocalDateTime serverLocalDateTime = LocalDateTime.now();
+
+        ZonedDateTime now = serverLocalDateTime.atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
 
         if(user.getQr() != null){
-            ZonedDateTime FinalDate = user.getQr().getFinal_datetime().atZone(ZoneId.systemDefault())
-                    .withZoneSameInstant(ZoneId.of("America/Chicago"));
+            ZonedDateTime FinalDate = user.getQr().getFinal_datetime().atZone(ZoneId.of("America/Chicago"));
 
             if(user.getQr().isActive() && now.isBefore(FinalDate)){
                 return new ResponseEntity<>(user.getQr().getHash(), HttpStatus.OK);
@@ -112,7 +112,10 @@ public class QRController {
     @PostMapping("/validate/{hash}")
     public ResponseEntity<?> validateQR(@PathVariable String hash) {
         QR qr = qrService.findByHash(hash);
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Chicago"));
+        LocalDateTime serverLocalDateTime = LocalDateTime.now();
+
+        ZonedDateTime now = serverLocalDateTime.atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("America/Chicago"));
 
         if(qr == null){
             return new ResponseEntity<>("QR no encontrado", HttpStatus.NOT_FOUND);
@@ -120,8 +123,7 @@ public class QRController {
             return new ResponseEntity<>("QR invalido", HttpStatus.FORBIDDEN);
         }
 
-        ZonedDateTime FinalDate = qr.getFinal_datetime().atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.of("America/Chicago"));
+        ZonedDateTime FinalDate = qr.getFinal_datetime().atZone(ZoneId.of("America/Chicago"));
 
         if(now.isAfter(FinalDate)){
             return new ResponseEntity<>("El tiempo valido ha pasado", HttpStatus.FORBIDDEN);
