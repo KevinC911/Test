@@ -21,6 +21,7 @@ public interface InvitationService {
     List<InvitationParsedDTO> findAllInvitationsByHome(Home home);
     List<InvitationParsedDTO> findAllRequestedInvitationsByHome(Home home);
     void deactivateInvitation(Invitation invitation);
+    void aproveInvitation(Invitation invitation);
     List<InvitationGuestsParsedDTO> findAllInvitationsByUser(User user);
     List<ArrivalInvitationDTO> findAllInvitationInfoByUser(User user);
 }

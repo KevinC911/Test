@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.uca.project.domain.entities.User;
 import com.uca.project.domain.entities.Role;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 // Controller para roles sin autenticacion, quitar posteriormente en prod

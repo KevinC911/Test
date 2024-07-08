@@ -12,16 +12,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    @PreAuthorize("hasAuthority('RESIDENTE')")
-    @PostMapping("/test")
-    public ResponseEntity<?> test(){
-        return new ResponseEntity<>("Test Ok", HttpStatus.OK);
-    }
-
-    @PostMapping("/test2")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> test2(){
-        return new ResponseEntity<>("Test Ok", HttpStatus.OK);
-    }
-
 }

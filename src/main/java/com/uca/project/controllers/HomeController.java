@@ -13,6 +13,7 @@ import com.uca.project.services.RoleService;
 import com.uca.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,7 +70,7 @@ public class HomeController {
         Home home = homeService.getHome(info.getNum_home());
 
         if(user == null || home == null){
-            return new ResponseEntity<>("User or home not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Usuario o casa no encontrado", HttpStatus.NOT_FOUND);
         }
 
         Role role = roleService.getRole("RSNR");

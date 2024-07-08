@@ -10,6 +10,7 @@ import com.uca.project.services.HomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class EntryController {
         return new ResponseEntity<>("Anonymous entry created", HttpStatus.CREATED);
     }
 
-    @GetMapping("/by-date")
+    @PostMapping("/by-date")
     public ResponseEntity<?> byDate(@RequestBody DatesToCompareDTO dates) {
         EntryParsedDTO info = entryService.getEntriesByTimeRange(
                 LocalDateTime.parse(dates.getFrom()), LocalDateTime.parse(dates.getTo())
@@ -50,7 +51,7 @@ public class EntryController {
 
     }
 
-    @GetMapping("/by-anon")
+    @PostMapping("/by-anon")
     public ResponseEntity<?> byAnon(@RequestBody DatesToCompareDTO dates) {
         EntryParsedDTO info = entryService.getEntriesByAnonimity(
                 LocalDateTime.parse(dates.getFrom()), LocalDateTime.parse(dates.getTo())
@@ -58,7 +59,7 @@ public class EntryController {
         return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
-    @GetMapping("/by-non-anon")
+    @PostMapping("/by-non-anon")
     public ResponseEntity<?> byNonAnon(@RequestBody DatesToCompareDTO dates) {
         EntryParsedDTO info = entryService.getEntriesByNotAnonimity(
                 LocalDateTime.parse(dates.getFrom()), LocalDateTime.parse(dates.getTo())
@@ -66,7 +67,7 @@ public class EntryController {
         return new ResponseEntity<>(info, HttpStatus.OK);
     }
 
-    @GetMapping("/by-home")
+    @PostMapping("/by-home")
     public ResponseEntity<?> byHome(@RequestBody HomeAndDatesToCompareDTO dates) {
         Home home = homeService.findByNumHome(dates.getHome());
 

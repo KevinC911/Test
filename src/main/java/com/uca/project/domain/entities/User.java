@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,12 +49,26 @@ public class User implements UserDetails {
     @JsonManagedReference  //la ocupo para la llamada listar por rol no me cree bucle
     private List<Role> roles;
 
-    @OneToOne(mappedBy = "user")
-    private Entry entry;
+    @OneToMany(mappedBy = "user")
+    private List<Entry> entries;
 
     @OneToOne(mappedBy = "user")
     @JsonBackReference
     private QR qr;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return code != null && code.equals(user.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -96,12 +96,15 @@ public class InvitationServiceImpl implements InvitationService {
         List<InvitationParsedDTO> invitationsDTO = new ArrayList<>();
         if(invitations != null){
             for (Invitation invitation : invitations) {
-                InvitationParsedDTO invitationParsedDTO = new InvitationParsedDTO();
-                invitationParsedDTO.setId(invitation.getCode());
-                invitationParsedDTO.setName(invitation.getUser().getUsername());
-                invitationParsedDTO.setPictureurl(invitation.getUser().getPictureurl());
-                invitationParsedDTO.setDates(invitation.getDates());
-                invitationsDTO.add(invitationParsedDTO);
+                if(!invitation.isRequest()){
+                    InvitationParsedDTO invitationParsedDTO = new InvitationParsedDTO();
+                    invitationParsedDTO.setId(invitation.getCode());
+                    invitationParsedDTO.setName(invitation.getUser().getUsername());
+                    invitationParsedDTO.setPictureurl(invitation.getUser().getPictureurl());
+                    invitationParsedDTO.setDates(invitation.getDates());
+                    invitationsDTO.add(invitationParsedDTO);
+                }
+
             }
         }
 
@@ -135,6 +138,12 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
+    public void aproveInvitation(Invitation invitation) {
+        invitation.setRequest(false);
+        invitationRepository.save(invitation);
+    }
+
+    @Override
     public List<InvitationGuestsParsedDTO> findAllInvitationsByUser(User user) {
         List<Invitation> invitations = invitationRepository.findAllByUserAndInvitationStateTrue(user);
         List<InvitationGuestsParsedDTO> invitationsDTO = new ArrayList<>();
@@ -147,6 +156,7 @@ public class InvitationServiceImpl implements InvitationService {
                     for(User resident: invitation.getHome().getUsers()){
                         if(resident.getRoles().contains(role)){
                             parsedDTO.setName(user.getUsername());
+                            break;
                         }
                     }
                     parsedDTO.setId(invitation.getCode());
@@ -163,8 +173,16 @@ public class InvitationServiceImpl implements InvitationService {
     public List<ArrivalInvitationDTO> findAllInvitationInfoByUser(User user) {
         List<Entry> entries = entryRepository.findEntriesByUser(user);
         List<ArrivalInvitationDTO> data = new ArrayList<>();
+        Role role = roleRepository.findByRole("RSDT");
+
         for(Entry entry: entries){
             ArrivalInvitationDTO invitationDTO = new ArrivalInvitationDTO();
+            for(User resident: entry.getHome().getUsers()){
+                if(resident.getRoles().contains(role)){
+                    invitationDTO.setName(user.getUsername());
+                    break;
+                }
+            }
             invitationDTO.setHome(entry.getHome().getNumHome());
             invitationDTO.setArrivalTime(entry.getArrivalDateTime());
             data.add(invitationDTO);

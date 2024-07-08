@@ -1,6 +1,5 @@
 package com.uca.project.controllers;
 
-import com.uca.project.domain.DTOs.RequestUniqueVisitDTO;
 import com.uca.project.domain.DTOs.InvitationAndDatesDTO;
 import com.uca.project.domain.entities.Home;
 import com.uca.project.domain.entities.Invitation;
@@ -11,6 +10,7 @@ import com.uca.project.services.servicesImpl.InvitationServiceImpl;
 import com.uca.project.services.servicesImpl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.naming.Binding;
 import java.util.UUID;
 
 @RestController
@@ -95,6 +94,7 @@ public class InvitationController {
 
         return new ResponseEntity<>("Invitacion creada", HttpStatus.CREATED);
     }
+
     // Ruta solamente para los residentes
     @GetMapping("/get/invitations/{homeNumber}")
     public ResponseEntity<?> getInvitations(@PathVariable String homeNumber) {
@@ -136,6 +136,16 @@ public class InvitationController {
         }
         invitationServiceImpl.deactivateInvitation(invitation);
         return new ResponseEntity<>("Invitacion desactivada", HttpStatus.OK);
+    }
+
+    @PostMapping("/aprove/{invitationID}")
+    public ResponseEntity<?> approveInvitation(@PathVariable String invitationID){
+        Invitation invitation = invitationServiceImpl.findById(UUID.fromString(invitationID));
+        if(invitation == null) {
+            return new ResponseEntity<>("Invitacion no encontrada", HttpStatus.NOT_FOUND);
+        }
+        invitationServiceImpl.aproveInvitation(invitation);
+        return new ResponseEntity<>("Invitacion aprovada", HttpStatus.OK);
     }
 
 }

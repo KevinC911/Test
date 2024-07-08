@@ -23,13 +23,14 @@ public class Entry {
     private LocalDateTime arrivalDateTime;
     private String reason;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", unique = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_id")
     private Home home;
+
 
     @Override
     public boolean equals(Object o) {
@@ -43,6 +44,7 @@ public class Entry {
     public int hashCode() {
         return Objects.hash(code);
     }
+
 
 
 }
